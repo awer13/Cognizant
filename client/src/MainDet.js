@@ -1,9 +1,10 @@
 // src/MainDet.jsx
 import React, { useState, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
+import { toKvPairs, mergeKv } from './utils/answers'
 import { Input, Row, Col, Button, Alert } from 'antd'
 
-// Задания
+// Заданиявы
 import DetTriangleTaskCombined from './DetTriangleTaskCombined'
 import DetCofactorEffTaskCombined from './DetCofactorEffTaskCombined'
 import DetCofactorTaskCombined from './DetCofactorTaskCombined'
@@ -74,11 +75,8 @@ function toLatexLabel(label = '') {
   return `\\text{${escaped}}`
 }
 
-const TASK_TITLES = [
-  'Задание 1: Формула «треугольников»',
-  'Задание 2: Эффективное разложение по дополнениям',
-  'Задание 3: Разложение по дополнениям'
-]
+const TASK_TITLES = ['']
+
 
 export default function MainDet() {
   // ФИО/Вариант/Группа
@@ -197,9 +195,18 @@ export default function MainDet() {
         max: TASK_MAXES[idx],
         points: perTaskPoints[idx] ?? 0,
         percent: perTaskPercents[idx] ?? 0,
-        rows: (results[idx]?.rows ?? []).map(({ key, label, w, gained }) => ({
-          key, label, maxPercent: w, gainedPercent: gained
-        }))
+        rows: (results[idx]?.rows ?? []).map(
+          ({ key, label, w, gained, correct, entered }) => ({
+            key,
+            label,
+            maxPercent: w,
+            gainedPercent: gained,
+            // новое:
+            correctAnswer: correct ?? null,
+            studentAnswer: entered ?? null
+          })
+        )
+        
       }))
     }
   }
@@ -364,7 +371,7 @@ export default function MainDet() {
             type="info"
             showIcon
             message="Формат чисел"
-            description="Вводить дроби нужно с запятой!"
+            description="Вводить десятичные числа нужно с запятой!"
             style={{ marginBottom: 12 }}
           />
           <h3>Введите ваши данные:</h3>

@@ -317,7 +317,7 @@ export default function DetTriangleTaskCombined({ taskNumber, onDone }) {
 
   return (
     <Box>
-      <h2>Вычисление определителя матрицы по формуле треугольника</h2>
+      <h2>Задание 1: Вычислить определитель матрицы по формуле треугольников</h2>
 
       {/* Матрица A */}
       <Grid>

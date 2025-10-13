@@ -292,11 +292,11 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
 
   return (
     <Box>
-      <h2>Вычисление определителя матрицы методом эффективного понижения порядка</h2>
+      <h2>Задание 2: Вычислить определитель матрицы методом эффективного понижения порядка</h2>
 
       {/* Всегда показываем текущую матрицу A (после преобразований) */}
       {renderMatrix(Awork, 'A')}
-      <Formula latex={'\\text{Сначала выполните элементарные преобразования, затем разложите по единственному ненулевому элементу выбранной строки/столбца.}'} />
+      <Formula latex={'\\text{Сначала выполните элементарные преобразования, затем разложите по элементам строки/столбца с единственным ненулевым элементом.}'} />
 
       {/* ── ШАГ 0: Преобразования ─────────────────────────────────────────────── */}
       {step === 0 && (
@@ -390,7 +390,7 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
 
           <Row gutter={8} align="middle" style={{ marginBottom: 6 }}>
             <Col flex="420px">
-              Введите номер <b>n</b> ({xType === 'col' ? 'столбца' : 'строки'}) X:
+              Введите номер <b>n</b> ({xType === 'col' ? 'столбца' : 'строки'}):
             </Col>
             <Col flex="220px">
               <InputNumber style={{ width: '100%' }} value={nUser} onChange={setNUser} min={1} max={N}/>
@@ -407,7 +407,7 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
           </Row>
 
           <Row gutter={8} align="middle" style={{ marginBottom: 6 }}>
-            <Col flex="420px">Значение ненулевого элемента <b>c</b>:</Col>
+            <Col flex="420px">Значение ненулевого элемента <b></b>:</Col>
             <Col flex="220px">
               <InputNumber style={{ width: '100%' }} value={cUser} onChange={setCUser}/>
             </Col>
@@ -427,7 +427,7 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
 
           <div style={{ marginBottom: 8 }}>
             <div style={{ marginBottom: 6 }}>
-              <b>Матрица B</b> (получается из текущей A удалением {xType === 'row' ? `строки n=${nUser||'n'}` : `столбца n=${nUser||'n'}`} и {xType === 'row' ? `столбца m=${mUser||'m'}` : `строки m=${mUser||'m'}`}):
+              <b>Матрица B</b>:
             </div>
             <div style={{ display:'inline-block', padding:'8px', background:'#f9fbff', border:'1px solid #e5eefb', borderRadius:8 }}>
               {Array.from({ length: sizeB }, (_, i) => (
@@ -450,7 +450,7 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
             <Col flex="180px">
               <Select style={{ width:'100%' }} options={signOptions} value={signUser} onChange={setSignUser} placeholder="+ / −" />
             </Col>
-            <Col flex="160px">Коэффициент (c):</Col>
+            <Col flex="160px">Коэффициент:</Col>
             <Col flex="180px">
               <InputNumber style={{ width:'100%' }} value={coefUser} onChange={setCoefUser}/>
             </Col>
@@ -475,7 +475,7 @@ export default function DetCofactorEffTaskCombined({ taskNumber, onDone }) {
           <SectionTitle>Шаг 3 — алгебраическое дополнение и det(A)</SectionTitle>
 
           <Row gutter={8} align="middle" style={{ marginBottom: 6 }}>
-            <Col flex="260px">Алгебраическое дополнение (для выбранного элемента):</Col>
+            <Col flex="260px">Введите значение алгебраического дополнения в этом разложении:</Col>
             <Col flex="220px">
               <InputNumber style={{ width:'100%' }} value={cofactorUser} onChange={setCofactorUser}/>
             </Col>

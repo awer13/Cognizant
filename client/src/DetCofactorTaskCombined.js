@@ -44,7 +44,7 @@ const randint = (rng, a, b) => a + Math.floor(rng() * (b - a + 1))
 function headerForCofactor(data, t1) {
   const [i, j] = t1.pos
   if (data.type === 1) {
-    return '\\text{Разложение по }4\\text{-му столбцу}\\;'
+    return ''
   }
   if (data.type === 2) {
     return `\\text{Разложение по }${i}\\text{-й строке}\\;`
@@ -101,7 +101,7 @@ function genMatrix1(seed) {
       { pos: [1, 4], coef: a14, sign: s1, B: B1 },
       { pos: [4, 4], coef: a44, sign: s2, B: B2 },
     ],
-    askA: { label: 'A_{14}', value: s1 * M14 },
+    askA: { label: 'a_{14}', value: s1 * M14 },
     askM: { label: 'M_{44}', value: M44 },
     detA,
   }
@@ -376,7 +376,7 @@ export default function DetCofactorTaskCombined({ taskNumber, onDone }) {
   return (
     <Box>
       {/* CHANGED: заголовок ближе к ТЗ */}
-      <h2>Вычисление определителя матрицы разложением по алгебраическим дополнениям</h2>
+      <h2>Задание 3: Вычислить определитель матрицы методом понижения порядка. Разложите по элементам 4-й строки</h2>
 
       <div style={{ marginBottom: 6 }}>
         <Formula latex={`A = \\begin{pmatrix}${A.map(r=>r.join(' & ')).join(' \\\\ ')}\\end{pmatrix}`} />
@@ -470,7 +470,7 @@ export default function DetCofactorTaskCombined({ taskNumber, onDone }) {
           {/* ⬇️ и здесь — инлайн-KaTeX для M_{..} */}
           <Row gutter={10} align="middle" style={{ marginBottom: 10 }}>
             <Col flex="380px">
-              Введите значение минора элемента <InlineMath latex={askM.label} />:
+              Введите значение минора <InlineMath latex={askM.label} />:
             </Col>
             <Col flex="200px">
               <InputNumber style={{ width: '100%' }} value={Mask} onChange={setMask} />
