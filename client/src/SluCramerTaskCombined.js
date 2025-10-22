@@ -17,7 +17,9 @@ const TitleKx = ({ textLatex }) => (
   <H3 dangerouslySetInnerHTML={{ __html: katex.renderToString(textLatex, { throwOnError:false }) }} />
 )
 
-// генерация в духе ТЗ (первый столбец — единицы и т.д.)
+// Helper to safely convert a value to a number, defaulting to 0
+const toNumber = val => Number(val) || 0;
+
 function genSystemTZ(seed) {
   const rng = mulberry32(seed)
   while (true) {
@@ -50,22 +52,23 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
   const header = `\\text{Решить }A\\,x=b\\quad ${latexMatrix(A,'A')}\\;,\\; ${latexVec(b,'b')}`
   const setVec = (setter,i,v)=> setter(prev=>{const cp=prev.slice(); cp[i]=v; return cp})
 
-  // 10 строк по 10%
   const verify = () => {
     const rows=[]
     const W=10
-    rows.push({ key:1, label:'Определитель \\det(A)', w:W, gained: near(Number(detUser),detA)?W:0 })
-    rows.push({ key:2, label:'\\Delta_1', w:W, gained: near(Number(d1),Δ1)?W:0 })
-    rows.push({ key:3, label:'\\Delta_2', w:W, gained: near(Number(d2),Δ2)?W:0 })
-    rows.push({ key:4, label:'\\Delta_3', w:W, gained: near(Number(d3),Δ3)?W:0 })
-    rows.push({ key:5, label:'Решение x_1', w:W, gained: near(Number(xUser[0]),x[0])?W:0 })
-    rows.push({ key:6, label:'Решение x_2', w:W, gained: near(Number(xUser[1]),x[1])?W:0 })
-    rows.push({ key:7, label:'Решение x_3', w:W, gained: near(Number(xUser[2]),x[2])?W:0 })
-    rows.push({ key:8, label:'(AX)_1', w:W, gained: near(Number(AxUser[0]), b[0])?W:0 })
-    rows.push({ key:9, label:'(AX)_2', w:W, gained: near(Number(AxUser[1]), b[1])?W:0 })
-    rows.push({ key:10,label:'(AX)_3', w:W, gained: near(Number(AxUser[2]), b[2])?W:0 })
+    const tolerance = 0.01
+
+    rows.push({ key:1, label:'Определитель \\det(A)', w:W, gained: near(toNumber(detUser),detA, tolerance)?W:0, correctAnswer: detA, studentAnswer: toNumber(detUser) })
+    rows.push({ key:2, label:'\\Delta_1', w:W, gained: near(toNumber(d1),Δ1, tolerance)?W:0, correctAnswer: Δ1, studentAnswer: toNumber(d1) })
+    rows.push({ key:3, label:'\\Delta_2', w:W, gained: near(toNumber(d2),Δ2, tolerance)?W:0, correctAnswer: Δ2, studentAnswer: toNumber(d2) })
+    rows.push({ key:4, label:'\\Delta_3', w:W, gained: near(toNumber(d3),Δ3, tolerance)?W:0, correctAnswer: Δ3, studentAnswer: toNumber(d3) })
+    rows.push({ key:5, label:'Решение x_1', w:W, gained: near(toNumber(xUser[0]),x[0], tolerance)?W:0, correctAnswer: x[0], studentAnswer: toNumber(xUser[0]) })
+    rows.push({ key:6, label:'Решение x_2', w:W, gained: near(toNumber(xUser[1]),x[1], tolerance)?W:0, correctAnswer: x[1], studentAnswer: toNumber(xUser[1]) })
+    rows.push({ key:7, label:'Решение x_3', w:W, gained: near(toNumber(xUser[2]),x[2], tolerance)?W:0, correctAnswer: x[2], studentAnswer: toNumber(xUser[2]) })
+    rows.push({ key:8, label:'(AX)_1', w:W, gained: near(toNumber(AxUser[0]), b[0], tolerance)?W:0, correctAnswer: b[0], studentAnswer: toNumber(AxUser[0]) })
+    rows.push({ key:9, label:'(AX)_2', w:W, gained: near(toNumber(AxUser[1]), b[1], tolerance)?W:0, correctAnswer: b[1], studentAnswer: toNumber(AxUser[1]) })
+    rows.push({ key:10,label:'(AX)_3', w:W, gained: near(toNumber(AxUser[2]), b[2], tolerance)?W:0, correctAnswer: b[2], studentAnswer: toNumber(AxUser[2]) })
     const scorePercent = rows.reduce((s,r)=>s+r.gained,0)
-    onDone?.({ scorePercent, rows, klass:'slu-cramer', params:{detA,Δ1,Δ2,Δ3}, A })
+    onDone?.({ scorePercent, rows, A })
   }
 
   return (
@@ -78,7 +81,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
           <TitleKx textLatex={'\\text{Шаг 1 — }\\Delta = \\det(A)'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
           <Col flex="110px"><Formula latex={'\\Delta = \\det(A):'} /></Col>
-            <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser} /></Col>
+            <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser} precision={4} /></Col>
           </Row>
           <Button type="primary" onClick={()=>setStep(2)} disabled={detUser===undefined}>Далее</Button>
         </>
@@ -89,13 +92,13 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
           <TitleKx textLatex={'\\text{Шаг 2 — }\\Delta_1,\\,\\Delta_2,\\,\\Delta_3'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
           <Col flex="0px"><Formula latex={'\\Delta_1:'}/></Col>
-          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d1} onChange={setD1}/></Col>
+          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d1} onChange={setD1} precision={4} /></Col>
 
           <Col flex="0px"><Formula latex={'\\Delta_2:'}/></Col>
-          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d2} onChange={setD2}/></Col>
+          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d2} onChange={setD2} precision={4} /></Col>
 
           <Col flex="0px"><Formula latex={'\\Delta_3:'}/></Col>
-          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d3} onChange={setD3}/></Col>
+          <Col flex="140px"><InputNumber style={{width:'100%'}} value={d3} onChange={setD3} precision={4} /></Col>
 
           </Row>
           <Button onClick={()=>setStep(1)} style={{marginRight:8}}>Назад</Button>
@@ -107,9 +110,9 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
         <>
           <TitleKx textLatex={'\\text{Шаг 3 — }x_i = \\dfrac{\\Delta_i}{\\Delta}'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
-            <Col flex="0px"><Formula latex="x_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[0]} onChange={v=>setVec(setXUser,0,v)}/></Col>
-            <Col flex="0px"><Formula latex="x_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[1]} onChange={v=>setVec(setXUser,1,v)}/></Col>
-            <Col flex="0px"><Formula latex="x_3:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[2]} onChange={v=>setVec(setXUser,2,v)}/></Col>
+            <Col flex="0px"><Formula latex="x_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[0]} onChange={v=>setVec(setXUser,0,v)} precision={4} /></Col>
+            <Col flex="0px"><Formula latex="x_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[1]} onChange={v=>setVec(setXUser,1,v)} precision={4} /></Col>
+            <Col flex="0px"><Formula latex="x_3:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[2]} onChange={v=>setVec(setXUser,2,v)} precision={4} /></Col>
           </Row>
           <Button onClick={()=>setStep(2)} style={{marginRight:8}}>Назад</Button>
           <Button type="primary" onClick={()=>setStep(4)} disabled={xUser.some(v=>v===undefined)}>Далее</Button>
@@ -120,9 +123,9 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
         <>
           <TitleKx textLatex={'\\text{Шаг 4 — проверка }AX=b'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
-            <Col flex="70px"><Formula latex="(AX)_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[0]} onChange={v=>setVec(setAxUser,0,v)}/></Col>
-            <Col flex="70px"><Formula latex="(AX)_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[1]} onChange={v=>setVec(setAxUser,1,v)}/></Col>
-            <Col flex="70px"><Formula latex="(AX)_3:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[2]} onChange={v=>setVec(setAxUser,2,v)}/></Col>
+            <Col flex="70px"><Formula latex="(AX)_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[0]} onChange={v=>setVec(setAxUser,0,v)} precision={4} /></Col>
+            <Col flex="70px"><Formula latex="(AX)_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[1]} onChange={v=>setVec(setAxUser,1,v)} precision={4} /></Col>
+            <Col flex="70px"><Formula latex="(AX)_3:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[2]} onChange={v=>setVec(setAxUser,2,v)} precision={4} /></Col>
           </Row>
           <Button onClick={()=>setStep(3)} style={{marginRight:8}}>Назад</Button>
           <Button type="primary" onClick={verify}>Проверить</Button>
@@ -131,3 +134,4 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
     </Box>
   )
 }
+

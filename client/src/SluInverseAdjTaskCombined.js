@@ -16,12 +16,10 @@ const Formula = ({ latex }) => (
   <div style={{ margin: '6px 0' }}
        dangerouslySetInnerHTML={{ __html: katex.renderToString(latex, { throwOnError:false }) }}/>
 )
-// заголовок-шапка, где есть текст + формула
 const TitleKx = ({ textLatex }) => (
   <H3 dangerouslySetInnerHTML={{ __html: katex.renderToString(textLatex, { throwOnError:false }) }} />
 )
 
-// ── генерация невырожденной 3×3
 function genInvertible3(seed) {
   const rng = mulberry32(seed)
   while (true) {
@@ -30,6 +28,13 @@ function genInvertible3(seed) {
   }
 }
 
+// Helper to safely convert a value to a number, defaulting to 0
+const toNumber = val => Number(val) || 0;
+// Helper to safely convert an array of values to numbers
+const toNumArray = arr => (arr || []).map(toNumber);
+// Helper to safely convert a matrix of values to numbers
+const toNumMatrix = matrix => (matrix || []).map(toNumArray);
+
 export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
   const seed = useMemo(()=> 0x51AD ^ (Number(taskNumber)||1), [taskNumber])
 
@@ -37,25 +42,19 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
   const detA = useMemo(()=> det3(A), [A])
   const Adj  = useMemo(()=> adjugate(A), [A])
   const Ainv = useMemo(()=> inv3(A), [A])
-
-  // один случайный столбец для A_{1j},A_{2j},A_{3j}
   const cofJ = useMemo(()=> randint(mulberry32(seed ^ 0xBEE),0,2), [seed])
-
-  // случайно: строка или столбец adj(A)
   const adjPick = useMemo(()=>{
     const rng = mulberry32(seed ^ 0xA11)
     const isRow = Math.floor(rng()*2)===0
     const k = randint(rng,0,2)
     return { isRow, k }
   },[seed])
-
-  // случайно: A·A^{-1} или A^{-1}·A
   const prodType = useMemo(()=> (mulberry32(seed ^ 0xACE)()<0.5?'AAinv':'AinvA'), [seed])
 
   const [step, setStep] = useState(1)
   const [detUser, setDetUser] = useState()
-  const [degFlag, setDegFlag] = useState()  // 1=невырожденная, 0=вырожденная
-  const [invFlag, setInvFlag] = useState()  // 1=существует, 0=не существует
+  const [degFlag, setDegFlag] = useState()
+  const [invFlag, setInvFlag] = useState()
   const [cofVals, setCofVals] = useState([undefined,undefined,undefined])
   const [adjLine, setAdjLine] = useState([undefined,undefined,undefined])
   const [userInv, setUserInv] = useState(Array.from({length:3},()=>Array(3).fill(undefined)))
@@ -63,41 +62,40 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
 
   const updateMat = (setter,i,j,v)=> setter(prev=>{ const cp=prev.map(r=>r.slice()); cp[i][j]=v; return cp })
 
-  // проверка
   const verify = () => {
     const rows=[]
     const W={det:11,deg:11,invFlag:11,cof1:11,cof2:11,cof3:11,adj:11,inv:12,prod:11}
+    const tolerance = 0.01
 
-    const okDet = near(Number(detUser), detA)
-    rows.push({ key:1, label:'Определитель \\det(A)', w:W.det, gained: okDet?W.det:0 })
+    const okDet = near(toNumber(detUser), detA, tolerance)
+    rows.push({ key:1, label:'Определитель \\det(A)', w:W.det, gained: okDet?W.det:0, correctAnswer: detA, studentAnswer: toNumber(detUser) })
 
-    const okDeg = Number(degFlag)===1
-    rows.push({ key:2, label:'Матрица невырождённая?', w:W.deg, gained: okDeg?W.deg:0 })
+    const okDeg = toNumber(degFlag)===1
+    rows.push({ key:2, label:'Матрица невырождённая?', w:W.deg, gained: okDeg?W.deg:0, correctAnswer: 1, studentAnswer: toNumber(degFlag) })
 
-    const okInvFlag = Number(invFlag)===1
-    rows.push({ key:3, label:'Обратная существует?', w:W.invFlag, gained: okInvFlag?W.invFlag:0 })
+    const okInvFlag = toNumber(invFlag)===1
+    rows.push({ key:3, label:'Обратная существует?', w:W.invFlag, gained: okInvFlag?W.invFlag:0, correctAnswer: 1, studentAnswer: toNumber(invFlag) })
 
     const c1=cofactor(A,0,cofJ), c2=cofactor(A,1,cofJ), c3=cofactor(A,2,cofJ)
-    rows.push({ key:4, label:`Алгебраическое дополнение A_{1${cofJ+1}}`, w:W.cof1, gained: near(Number(cofVals[0]),c1)?W.cof1:0 })
-    rows.push({ key:5, label:`Алгебраическое дополнение A_{2${cofJ+1}}`, w:W.cof2, gained: near(Number(cofVals[1]),c2)?W.cof2:0 })
-    rows.push({ key:6, label:`Алгебраическое дополнение A_{3${cofJ+1}}`, w:W.cof3, gained: near(Number(cofVals[2]),c3)?W.cof3:0 })
+    rows.push({ key:4, label:`Алгебраическое дополнение A_{1${cofJ+1}}`, w:W.cof1, gained: near(toNumber(cofVals[0]),c1, tolerance)?W.cof1:0, correctAnswer: c1, studentAnswer: toNumber(cofVals[0]) })
+    rows.push({ key:5, label:`Алгебраическое дополнение A_{2${cofJ+1}}`, w:W.cof2, gained: near(toNumber(cofVals[1]),c2, tolerance)?W.cof2:0, correctAnswer: c2, studentAnswer: toNumber(cofVals[1]) })
+    rows.push({ key:6, label:`Алгебраическое дополнение A_{3${cofJ+1}}`, w:W.cof3, gained: near(toNumber(cofVals[2]),c3, tolerance)?W.cof3:0, correctAnswer: c3, studentAnswer: toNumber(cofVals[2]) })
 
     const expLine = adjPick.isRow ? Adj[adjPick.k] : [Adj[0][adjPick.k],Adj[1][adjPick.k],Adj[2][adjPick.k]]
-    const okAdj = expLine.every((v,i)=> near(Number(adjLine[i]),v))
-    rows.push({ key:7, label: adjPick.isRow ? 'Строка \\operatorname{adj}(A)' : 'Столбец \\operatorname{adj}(A)', w:W.adj, gained: okAdj?W.adj:0 })
+    const okAdj = expLine.every((v,i)=> near(toNumber(adjLine[i]),v, tolerance))
+    rows.push({ key:7, label: adjPick.isRow ? 'Строка \\operatorname{adj}(A)' : 'Столбец \\operatorname{adj}(A)', w:W.adj, gained: okAdj?W.adj:0, correctAnswer: expLine, studentAnswer: toNumArray(adjLine) })
 
     let okInv=true
-    for (let i=0;i<3;i++) for (let j=0;j<3;j++) okInv &= near(Number(userInv[i][j]), Ainv[i][j])
-    rows.push({ key:8, label:'Матрица A^{-1}', w:W.inv, gained: okInv?W.inv:0 })
+    for (let i=0;i<3;i++) for (let j=0;j<3;j++) okInv &= near(toNumber(userInv[i]?.[j]), Ainv[i][j], tolerance)
+    rows.push({ key:8, label:'Матрица A^{-1}', w:W.inv, gained: okInv?W.inv:0, correctAnswer: Ainv, studentAnswer: toNumMatrix(userInv) })
 
     const expected = prodType==='AAinv' ? matMul(A,Ainv) : matMul(Ainv,A)
     let okProd=true
-    for (let i=0;i<3;i++) for (let j=0;j<3;j++) okProd &= near(Number(prodVal[i][j]), expected[i][j])
-    rows.push({ key:9, label: prodType==='AAinv' ? 'Произведение A\\cdot A^{-1}' : 'Произведение A^{-1}\\cdot A', w:W.prod, gained: okProd?W.prod:0 })
+    for (let i=0;i<3;i++) for (let j=0;j<3;j++) okProd &= near(toNumber(prodVal[i]?.[j]), expected[i][j], tolerance)
+    rows.push({ key:9, label: prodType==='AAinv' ? 'Произведение A\\cdot A^{-1}' : 'Произведение A^{-1}\\cdot A', w:W.prod, gained: okProd?W.prod:0, correctAnswer: expected, studentAnswer: toNumMatrix(prodVal) })
 
     const scorePercent = rows.reduce((s,r)=>s+r.gained,0)
-    onDone?.({ scorePercent, rows, klass:'slu-inv-adj',
-      params:{ cofJ:cofJ+1, adj:{isRow:adjPick.isRow, k:adjPick.k+1}, product:prodType, detA }, A })
+    onDone?.({ scorePercent, rows, A })
   }
 
   const header = `\\text{Дана матрица }\\;${latexMatrix(A,'A')}`
@@ -112,7 +110,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
           <TitleKx textLatex={'\\text{Шаг 1 — }\\det(A),\\ \\text{невырождённость и существование }A^{-1}'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="110px"><Formula latex="\\det(A):" /></Col>
-            <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser}/></Col>
+            <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser} precision={4} /></Col>
           </Row>
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="110px"><span>Матрица:</span></Col>
@@ -143,7 +141,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
             <Row key={i} gutter={8} align="middle" style={{ marginBottom:8 }}>
               <Col flex="10px"><Formula latex={`A_{${i+1}${cofJ+1}}:`} /></Col>
               <Col flex="170px">
-                <InputNumber style={{width:'100%'}} value={cofVals[i]}
+                <InputNumber style={{width:'100%'}} value={cofVals[i]} precision={4}
                              onChange={v=>{ const cp=cofVals.slice(); cp[i]=v; setCofVals(cp) }}/>
               </Col>
             </Row>
@@ -161,7 +159,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             {[0,1,2].map(t=>(
               <Col key={t} flex="160px">
-                <InputNumber style={{width:'100%'}} value={adjLine[t]}
+                <InputNumber style={{width:'100%'}} value={adjLine[t]} precision={4}
                              onChange={v=>{ const cp=adjLine.slice(); cp[t]=v; setAdjLine(cp) }}/>
               </Col>
             ))}
@@ -178,7 +176,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
             <Row key={i} gutter={8} align="middle" style={{ marginBottom:6 }}>
               {[0,1,2].map(j=>(
                 <Col key={j} flex="160px">
-                  <InputNumber style={{width:'100%'}} value={userInv[i][j]}
+                  <InputNumber style={{width:'100%'}} value={userInv[i][j]} precision={4}
                                onChange={v=>updateMat(setUserInv,i,j,v)}/>
                 </Col>
               ))}
@@ -198,7 +196,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
             <Row key={i} gutter={8} align="middle" style={{ marginBottom:6 }}>
               {[0,1,2].map(j=>(
                 <Col key={j} flex="160px">
-                  <InputNumber style={{width:'100%'}} value={prodVal[i][j]}
+                  <InputNumber style={{width:'100%'}} value={prodVal[i][j]} precision={4}
                                onChange={v=>updateMat(setProdVal,i,j,v)}/>
                 </Col>
               ))}

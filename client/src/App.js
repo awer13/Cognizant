@@ -6,8 +6,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 //import MainExtremum from './MainExtremum' // multivariable
 //import MainExtremum0 from './MainExtremum0' //testVersion
 // import MainSeries from './MainSeries'
-import MainDet from './MainDet'
-// import MainSlu from './MainSlu'
+// import MainDet from './MainDet'
+import MainSlu from './MainSlu'
 //import MainSLAE from './MainSLAE'
 
 function App() {
@@ -22,8 +22,8 @@ function App() {
       //element: <Main />, //  added by me
      // element: <MainLimit />, //  added by me
      // element: <MainMiniMax />, //  added by me
-     element: <MainDet />,
-    // element: <MainSlu />,
+    //  element: <MainDet />,
+    element: <MainSlu />,
       children: [ ],
     },
     {
@@ -37,8 +37,8 @@ function App() {
      // element: <MainExtremum0 />, // disabled by me on march 20
       //element: <MainSLAE />,
       // element: <MainSeries />,
-      element: <MainDet />,
-      // element: <MainSlu />,
+      // element: <MainDet />,
+      element: <MainSlu />,
       //element: <Main />,
       //element: <MainMiniMax />,
       //element: <MainLimit />,
