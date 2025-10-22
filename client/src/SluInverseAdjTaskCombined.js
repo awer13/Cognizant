@@ -107,7 +107,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
 
       {step===1 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 1 — }\\det(A),\\ \\text{невырождённость и существование }A^{-1}'} />
+          <TitleKx textLatex={'\\text{Вопрос 1 — Введите}\\det(A)'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="110px"><Formula latex="\\det(A):" /></Col>
             <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser} precision={4} /></Col>
@@ -136,24 +136,31 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
 
       {step===2 && (
         <>
-          <TitleKx textLatex={`\\text{Шаг 2 — алгебраические дополнения столбца }${cofJ+1}`} />
+        {/* <<< ИЗМЕНЕНИЕ: Заголовок шага изменен */}
+        <TitleKx textLatex={`\\text{Вопрос 2 — Введите алгебраические дополнения столбца }${cofJ+1}`} />
+        {/* <<< ИЗМЕНЕНИЕ: Создаем одну строку */}
+        <Row gutter={16} align="middle" style={{ marginBottom:8 }}>
+          {/* <<< ИЗМЕНЕНИЕ: Генерируем колонки внутри строки */}
           {[0,1,2].map(i=>(
-            <Row key={i} gutter={8} align="middle" style={{ marginBottom:8 }}>
-              <Col flex="10px"><Formula latex={`A_{${i+1}${cofJ+1}}:`} /></Col>
-              <Col flex="170px">
+            <React.Fragment key={i}>
+               {/* <<< ИЗМЕНЕНИЕ: Колонка для метки */}
+              <Col flex="50px"><Formula latex={`A_{${i+1}${cofJ+1}}:`} /></Col>
+               {/* <<< ИЗМЕНЕНИЕ: Колонка для поля ввода, занимает оставшееся место */}
+              <Col flex="200px">
                 <InputNumber style={{width:'100%'}} value={cofVals[i]} precision={4}
                              onChange={v=>{ const cp=cofVals.slice(); cp[i]=v; setCofVals(cp) }}/>
               </Col>
-            </Row>
+            </React.Fragment>
           ))}
-          <Button onClick={()=>setStep(1)} style={{marginRight:8}}>Назад</Button>
-          <Button type="primary" onClick={()=>setStep(3)} disabled={cofVals.some(v=>v===undefined)}>Далее</Button>
-        </>
+        </Row>
+        <Button onClick={()=>setStep(1)} style={{marginRight:8}}>Назад</Button>
+        <Button type="primary" onClick={()=>setStep(3)} disabled={cofVals.some(v=>v===undefined)}>Далее</Button>
+      </>
       )}
 
       {step===3 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 3 — часть }\\operatorname{adj}(A)'} />
+          <TitleKx textLatex={'\\text{Вопрос 3 — часть }\\operatorname{adj}(A)'} />
           <Alert type="info" showIcon style={{marginBottom:8}}
                  message={adjPick.isRow?`Введите элементы ${adjPick.k+1}-й строки adj(A)`:`Введите элементы ${adjPick.k+1}-го столбца adj(A)`}/>
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
@@ -171,7 +178,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
 
       {step===4 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 4 — матрица }A^{-1}'} />
+          <TitleKx textLatex={'\\text{Вопрос 4 — Введите матрицу }A^{-1}'} />
           {Array.from({length:3},(_,i)=>(
             <Row key={i} gutter={8} align="middle" style={{ marginBottom:6 }}>
               {[0,1,2].map(j=>(
@@ -190,7 +197,7 @@ export default function SluInverseAdjTaskCombined({ taskNumber, onDone }) {
 
       {step===5 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 5 — проверка произведения}'} />
+          <TitleKx textLatex={'\\text{Вопрос 5 — проверка произведения}'} />
           <Formula latex={prodType==='AAinv' ? 'A\\cdot A^{-1}' : 'A^{-1}\\cdot A'} />
           {Array.from({length:3},(_,i)=>(
             <Row key={i} gutter={8} align="middle" style={{ marginBottom:6 }}>

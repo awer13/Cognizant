@@ -83,9 +83,9 @@ function toLatexLabel(raw) {
 }
 
 const TASK_TITLES = [
-  'Задание 1: Обратная матрица через присоединённую (3×3)',
-  'Задание 2: СЛАУ — матричный метод',
-  'Задание 3: СЛАУ — метод Крамера'
+  'Задание 1: Вычислите обратную матрицу через присоединённую матрицу',
+  'Задание 2: Решить СЛАУ матричным методом',
+  'Задание 3: Решить СЛАУ методом Крамера'
 ]
 
 export default function MainSlu() {
@@ -281,7 +281,7 @@ export default function MainSlu() {
       <form onSubmit={handleSubmitID}>
         <Container>
           <h1>СЛАУ</h1>
-          <Alert type="info" showIcon message="Формат чисел" description="Вводить дроби нужно с точкой! Все значения будут округлены до 4-х знаков после запятой." style={{ marginBottom: 12 }}/>
+          <Alert type="info" showIcon message="Формат чисел" description="В качестве разделителя дробной части десятичного числа необходимо использовать точку(не запятую)! Десятичные числа необходимо вводить с точностью до 4-ех знаков после запятой!" style={{ marginBottom: 12 }}/>
           <h3>Введите ваши данные:</h3>
           <Row gutter={16} style={{ marginBottom: 6 }}><label style={{ width: 90 }}>Фамилия</label><Col span={16}><Input type="text" onChange={(e)=>setLName(e.target.value)} value={lastName} required disabled={disabled} /></Col></Row>
           <Row gutter={16} style={{ marginBottom: 6 }}><label style={{ width: 90 }}>Имя</label><Col span={16}><Input type="text" onChange={(e)=>setFName(e.target.value)} value={firstName} required disabled={disabled} /></Col></Row>

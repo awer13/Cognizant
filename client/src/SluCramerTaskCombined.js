@@ -49,7 +49,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
   const [xUser, setXUser] = useState([undefined,undefined,undefined])
   const [AxUser, setAxUser] = useState([undefined,undefined,undefined])
 
-  const header = `\\text{Решить }A\\,x=b\\quad ${latexMatrix(A,'A')}\\;,\\; ${latexVec(b,'b')}`
+  const header = `\\text{}A\\,x=b\\quad ${latexMatrix(A,'A')}\\;,\\; ${latexVec(b,'b')}`
   const setVec = (setter,i,v)=> setter(prev=>{const cp=prev.slice(); cp[i]=v; return cp})
 
   const verify = () => {
@@ -78,7 +78,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
 
       {step===1 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 1 — }\\Delta = \\det(A)'} />
+          <TitleKx textLatex={'\\text{Вопрос 1 — Введите}\\Delta = \\det(A)'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
           <Col flex="110px"><Formula latex={'\\Delta = \\det(A):'} /></Col>
             <Col flex="170px"><InputNumber style={{width:'100%'}} value={detUser} onChange={setDetUser} precision={4} /></Col>
@@ -89,7 +89,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
 
       {step===2 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 2 — }\\Delta_1,\\,\\Delta_2,\\,\\Delta_3'} />
+          <TitleKx textLatex={'\\text{Вопрос 2 — Введите }\\Delta_1,\\,\\Delta_2,\\,\\Delta_3'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
           <Col flex="0px"><Formula latex={'\\Delta_1:'}/></Col>
           <Col flex="140px"><InputNumber style={{width:'100%'}} value={d1} onChange={setD1} precision={4} /></Col>
@@ -108,7 +108,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
 
       {step===3 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 3 — }x_i = \\dfrac{\\Delta_i}{\\Delta}'} />
+          <TitleKx textLatex={'\\text{Вопрос 3 — Введите решение системы}'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="0px"><Formula latex="x_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[0]} onChange={v=>setVec(setXUser,0,v)} precision={4} /></Col>
             <Col flex="0px"><Formula latex="x_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={xUser[1]} onChange={v=>setVec(setXUser,1,v)} precision={4} /></Col>
@@ -121,7 +121,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
 
       {step===4 && (
         <>
-          <TitleKx textLatex={'\\text{Шаг 4 — проверка }AX=b'} />
+          <TitleKx textLatex={'\\text{Вопрос 4 — проверка }AX=b'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="70px"><Formula latex="(AX)_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[0]} onChange={v=>setVec(setAxUser,0,v)} precision={4} /></Col>
             <Col flex="70px"><Formula latex="(AX)_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[1]} onChange={v=>setVec(setAxUser,1,v)} precision={4} /></Col>
