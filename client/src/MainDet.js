@@ -18,7 +18,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from './firebase'
 
 // распределение максимумов по заданиям: [Задание1, Задание2, Задание3]
-const TASK_MAXES = [8, 8, 9] // суммарно 25
+const TASK_MAXES = [6, 7, 7] // суммарно 25
 
 const MAX_RETRIES = 2 // сколько авто-повторов при ошибке
 
@@ -323,7 +323,7 @@ export default function MainDet() {
             </tbody>
             <tfoot>
               <tr>
-                <td>25</td>
+                <td>20</td>
                 <td className="left">ИТОГО</td>
                 <td>{totalPercent}%</td>
               </tr>

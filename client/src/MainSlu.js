@@ -14,7 +14,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from './firebase'
 
 // распределение максимумов по заданиям: [1,2,3] = 8/8/9 (итого 25)
-const TASK_MAXES = [8, 8, 9]
+const TASK_MAXES = [6, 7, 7]
 const MAX_RETRIES = 2 // сколько авто-повторов при ошибке
 
 const StyledButton = styled.button`
@@ -259,7 +259,7 @@ export default function MainSlu() {
                 return (<tr key={r.key}><td>{Math.round(r.w)}</td><td className="left"><LatexCell latex={toLatexLabel(r.label)} /></td><td>{Math.round(r.gained)}</td></tr>)
               })}
             </tbody>
-            <tfoot><tr><td>25</td><td className="left">ИТОГО</td><td>{totalPercent}%</td></tr></tfoot>
+            <tfoot><tr><td>20</td><td className="left">ИТОГО</td><td>{totalPercent}%</td></tr></tfoot>
           </table>
           <div style={{ textAlign:'center', marginTop:12 }}><span className="blue">Общая оценка {totalPercent}% = {totalPoints} балл(ов) из {totalMax}</span></div>
           <div style={{ marginTop:14, display:'flex', gap:8, alignItems:'center' }}>

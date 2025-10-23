@@ -121,7 +121,7 @@ export default function SluCramerTaskCombined({ taskNumber, onDone }) {
 
       {step===4 && (
         <>
-          <TitleKx textLatex={'\\text{Вопрос 4 — проверка }AX=b'} />
+          <TitleKx textLatex={'\\text{Вопрос 4 — проверка }AX_i, i=1,2,3'} />
           <Row gutter={8} align="middle" style={{ marginBottom:8 }}>
             <Col flex="70px"><Formula latex="(AX)_1:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[0]} onChange={v=>setVec(setAxUser,0,v)} precision={4} /></Col>
             <Col flex="70px"><Formula latex="(AX)_2:"/></Col><Col flex="140px"><InputNumber style={{width:'100%'}} value={AxUser[1]} onChange={v=>setVec(setAxUser,1,v)} precision={4} /></Col>
